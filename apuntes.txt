@@ -1,0 +1,179 @@
+
+1.- environments\environment.ts
+
+En esta carpeta se configura la conexion de la 
+base de datos con firebase
+Es aquí donde se depositan las variables de configuración
+que permite conectarse con nuestra base de datos en firebase
+
+2.- Instalación de la dependencia de AngularFire para hacer 
+la conexión y la gestión de la conexión
+
+Comando: npm i firebase @angular/fire 
+
+Con este comando se instala las versiones actuales
+tanto de firebase como de @angular/fire. Las versiones
+para este proyecto son:  
+
++ @angular/fire@5.2.1
++ firebase@6.3.5
+
+estas dependencias se guardan en la carpeta de node_modules
+
+3.- importacion de modelos en archivo app.module.ts (matriz de las importaciones)
+
+    De las dependencias que instalamos en nuestro proyecto en el anterior paso:
+
+        import { AngularFireModule } from '@angular/fire';
+        import { AngularFirestoreModule } from '@angular/fire/firestore';
+
+
+    Se importa donde se declararon las variables que usaremos para poder definir
+    las variables de entorno que vayamos necesitando para el proyecto, que en este caso
+    fue para hacer posible la conexión a firebase.
+
+        import { environment } from '../environments/environment';
+
+
+    Para poder hacer reactivo nuestro formulario se importa el siguiente módulo:
+
+        import { ReactiveFormsModule } from '@angular/forms';
+
+
+    Despues de importar los módulosa hora se inyectan en los imports:
+
+
+        imports: [
+            BrowserModule,
+            AngularFireModule.initializeApp(environment.firebaseConfig),
+            AngularFirestoreModule,
+            ReactiveFormsModule
+            ],
+
+
+4.- Generar un servicio que servira para conectarse a nuestro backend (en este caso firebase)
+
+        Con el siguiente comando generamos la carpeta services y dentro se genera el archivo data-db:
+
+                ng g s services/data-db
+
+        Ya generada la carpeta donde se encuentra nuestro servicio, se importa los modulos
+        AngularFirestore y AngularFirestoreCollection que se encuentran ubicados
+        en @angular/fire/firestore en el archivo data-db.service.ts ubicado en la carpeta
+        services
+
+                import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+
+        Se importa el patrón Observable que se encuentra en la carpeta rxjs ubicada en 
+        node_modules
+
+                import { Observable } from 'rxjs';
+
+                * Patrón  Observable: 
+                Es aquello que queremos observar, 
+                que será implementado mediante una colección de eventos o valores futuros.
+                Un observable puede ser creado a partir de eventos de usuario derivados 
+                del uso de un formulario, una llamada HTTP, un almacén de datos, etc. 
+                Mediante el observable nos podemos suscribir a eventos que nos permiten 
+                hacer cosas cuando cambia lo que se esté observando.
+
+                * rxjs:
+                Reactive Extensions (Rx) es una librería hecha por Microsoft 
+                para implementar la programación reactiva, creando aplicaciones que 
+                son capaces de usar el patrón observable para gestionar operaciones asíncronas. 
+                Por su parte RxJS es la implementación en Javascript de ReactiveExtensions, 
+                una más de las adaptaciones existentes en muchos otros lenguajes de programación.
+
+        Después se configura la clase para que pueda realizar  el servicio
+
+
+
+
+5.- Creación de la carpeta models
+
+        Dentro de la carpeta, se creara un archivo llamado message.interface.ts
+        En el archivo creado se declaran los campos que se ocuparan en el formulario. 
+        Posteriormente se importara el archivo en el archivo de services/data-db.ts
+
+6.- Inyectar el servicio en el archivo app.module.ts
+
+        Se importa el servicio que porbera de la base de datos a nuestro formulario
+        y se intecta como provedor:
+
+        import { DataDbService } from '../app/services/data-db.service';
+
+        providers: [DataDbService],
+
+
+7.- Trabajar con  nuestro formulario en la carpeta contact.component.ts
+
+        Se importa nuestro servicio, que en este caso sería la base de datos DataDbService:
+
+          import { DataDbService } from '../../services/data-db.service';
+
+        Tambien se importan los módulos que permitiran que el formulario sea reactivo:
+
+           import { FormControl, FormGroup } from '@angular/forms';  
+
+        Después se crea el grupo del formulario dentro de la función createFormGroup
+
+             createFormGroup(){
+
+                  return new FormGroup({
+
+                    email: new FormControl(''),
+                    name: new FormControl(''),
+                    message: new FormControl('')
+                    });
+            }
+
+        Se creara una propiedad que se llamara contactForm  y que sera de tipo  FormGroup;
+
+              contactForm: FormGroup;
+
+              constructor() { }
+
+       En el constructor se inyectara el servicio para que al iniciar el proyecto
+       se instancie el formulario:
+
+       constructor(private dbData: DataDbService) { 
+
+             this.contactForm = this.createFormGroup();
+
+            }
+
+        Se crean dos metodos, uno que permita limpiar nuestro formulario y 
+        otro metodos que va a permitir guardar los valores de nuestro formulario.
+
+         onResetForm(){
+             this.contactForm.reset();
+        }
+
+        onSaveForm(){
+              console.log('Saved');
+        }
+
+
+8.- Trabajar con el formulario desde el componente contact dentro de su archivo html
+
+         <div class="form-container">
+               <h1>Contatc us!</h1>
+                <form [formGroup]="contactForm">
+                     <input type="text" formControlName="name" placeholder="Your Name">
+                     <input type="text" formControlName="email" placeholder="Your email">
+                     <textarea formControlName="message" placeholder="Type your message"></textarea>
+                     <button type="submit" class="btn-send">Send</button>
+                </form>
+         </div>
+9.- Trabajando con los estilos de contatc.component.css
+
+10.- Trabajando con la lógica para los encios desde el archivo contact.component.html
+         
+
+Fuentes:
+
+    Formularios reactivos:
+        https://code.tutsplus.com/es/tutorials/introduction-to-forms-in-angular-4-reactive-forms--cms-29787
+
+    Patrón Observable - librería RxJS 
+        https://desarrolloweb.com/articulos/introduccion-teorica-observables-angular.html

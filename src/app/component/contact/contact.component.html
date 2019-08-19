@@ -1,0 +1,10 @@
+<div class="form-container">
+    <h1>Contatc us!</h1>
+    <!-- El método invocado por (ngSubmit) método se encuentra declarado en el archivo contact.component.ts-->
+    <form [formGroup]="contactForm" (ngSubmit)="onSaveForm()">
+        <input type="text" formControlName="name" placeholder="Your Name">
+        <input type="text" formControlName="email" placeholder="Your email">
+        <textarea formControlName="message" placeholder="Type your message"></textarea>
+        <button type="submit" class="btn-send">Send</button>
+    </form>
+</div>
